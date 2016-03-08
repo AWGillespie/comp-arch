@@ -145,37 +145,79 @@ int main(int argc, char** argv)
 		{
 			//AND
 			case 0x0000:
-				//code
+				if((IR&0x8000) == 0) //Direct
+				{
+				}
+				else //Indirect
+				{
+					AR = memory[AR];
+				}
 			break;
 
 			//ADD
 			case 0x1000:
-				//code
+				if((IR&0x8000) == 0) //Direct
+				{
+				}
+				else //Indirect
+				{
+					AR = memory[AR];
+				}
 			break;
 
 			//LDA
 			case 0x2000:
-				//code
+				if((IR&0x8000) == 0) //Direct
+				{
+				}
+				else //Indirect
+				{
+					AR = memory[AR];
+				}
 			break;
 
 			//STA
 			case 0x3000:
-				//code
+				if((IR&0x8000) == 0) //Direct
+				{
+				}
+				else //Indirect
+				{
+					AR = memory[AR];
+				}
 			break;
 
 			//BUN
 			case 0x4000:
-				//code
+				if((IR&0x8000) == 0) //Direct
+				{
+				}
+				else //Indirect
+				{
+					AR = memory[AR];
+				}
 			break;
 
 			//BSA
 			case 0x5000:
-				//code
+				if((IR&0x8000) == 0) //Direct
+				{
+				}
+				else //Indirect
+				{
+					AR = memory[AR];
+				}
 			break;
 
 			//ISZ
 			case 0x6000:
-				//code
+				if((IR&0x8000) == 0) //Direct
+				{
+				}
+				else //Indirect
+				{
+					AR = memory[AR];
+				}
 			break;
 		}
 	}
