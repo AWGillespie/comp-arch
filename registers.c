@@ -73,12 +73,12 @@ int main(int argc, char** argv)
 		{
 			//CLA
 			case 0x0800:
-				//code
+				AC ^= AC; //AC xor AC is 0
 			break;
 
 			//CLE
 			case 0x0400:
-				//code
+				E ^= E; //E xor E is 0
 			break;
 			
 			//CMS
@@ -110,7 +110,8 @@ int main(int argc, char** argv)
 			
 			//INC
 			case 0x0020:
-				//code
+				AC++;
+				//print();
 			break;
 			
 			//SPA
@@ -152,6 +153,12 @@ int main(int argc, char** argv)
 				{
 					AR = memory[AR];
 				}
+				E ^= E;
+				if((memory[AR] + AC) < AC) //overflow
+				{
+					E = 1;
+				}
+				AC += memory[AR];
 			break;
 
 			//ADD
@@ -163,6 +170,12 @@ int main(int argc, char** argv)
 				{
 					AR = memory[AR];
 				}
+
+				DR = memory[AR];
+				//print();
+
+				AC &= DR;
+				//print();
 			break;
 
 			//LDA
@@ -174,6 +187,12 @@ int main(int argc, char** argv)
 				{
 					AR = memory[AR];
 				}
+
+				DR = memory[AR];
+				//print();
+
+				AC = DR;
+				//print();
 			break;
 
 			//STA
@@ -185,6 +204,8 @@ int main(int argc, char** argv)
 				{
 					AR = memory[AR];
 				}
+				memory[AR] = AC;
+				//print();
 			break;
 
 			//BUN
@@ -196,6 +217,8 @@ int main(int argc, char** argv)
 				{
 					AR = memory[AR];
 				}
+				PC = AR;
+				//print();
 			break;
 
 			//BSA
@@ -207,6 +230,13 @@ int main(int argc, char** argv)
 				{
 					AR = memory[AR];
 				}
+				memory[AR] = PC;
+
+				AR++;
+				//print();
+
+				PC = AR;
+				//print();
 			break;
 
 			//ISZ
@@ -218,6 +248,19 @@ int main(int argc, char** argv)
 				{
 					AR = memory[AR];
 				}
+				DR = memory[AR];
+				//print();
+
+				DR++;
+				//print();
+
+				memory[AR] = DR;
+
+				if (DR == 0)
+				{
+					PC++;
+				}
+				//print();
 			break;
 		}
 	}
