@@ -10,7 +10,7 @@ int main(int argc, char** argv)
 	unsigned short DR;
 	unsigned short AR;
 	unsigned short IR;
-	unsigned short TR;
+	//unsigned short TR;
 	unsigned short E;
 
 	srand(time(0));
@@ -37,18 +37,40 @@ int main(int argc, char** argv)
     //set random register values
     PC = rand() % 400;
     AC = rand() % 0x0FFF;
-    PC = rand() % 0x0FFF;
+    //PC = rand() % 0x0FFF;
     DR = rand() % 0x0FFF;
-    AR = rand() % 0x0FFF;
+    AR = rand() % 400;
     IR = rand() % 0x0FFF;
-    TR = rand() % 0x0FFF;
+    //TR = rand() % 0x0FFF;
+	E = rand() % 2;
 
-	//set for testing
-	PC = 100;
-	memory[100] = 0x7080;
-	memory[101] = 0x7040;
+	//set for testinga
 
-    for(int idx = 0; idx < 2; ++idx)
+
+	memory[0x0064] = 0x0035;
+	memory[0x0065] = 0x00A4;
+	memory[0x0066] = 0x0040;
+	memory[0x0067] = 0x0025;
+	memory[0x0068] = 0x0020;
+	memory[0x0069] = 19;
+
+	PC = 0;
+	memory[0] = 0x7200;
+	memory[1] = 0x7080;
+	memory[2] = 0x7040;
+	memory[3] = 0x7020;
+	memory[4] = 0x0064;
+	memory[5] = 0x2065;
+	memory[6] = 0x3066;
+	memory[7] = 0x5069;
+	memory[20] = 0x6067;
+	memory[21] = 0x4069;
+	memory[8] = 0x1068;
+	memory[9] = 0x7400;
+	memory[10] = 0x7800;
+	memory[11] = 0x7001;
+
+    for(int idx = 0; idx < 14; ++idx)
 	{
 	//T0
     AR = PC;
@@ -65,34 +87,43 @@ int main(int argc, char** argv)
 	printf("T1 | %04hX | %04hX | %04hX | %04hX | %04hX | %04hX | %04hX |\n",
 			IR, AC, DR, PC, AR, memory[AR], E);
 	printf("---|------+------+------+------+------+------+------|\n");
+	fflush(stdout);
 
     //T2
+	AR = (0x0FFF&IR);
+
+	fprintf(stderr, "AR set by IR to: %04hX\n", AR);
+
 	if((0x7000&IR) == 0x7000)
 	{
 		switch(0x0FFF&IR)
 		{
 			//CLA
 			case 0x0800:
+				printf("CLA\n");
 				AC ^= AC; //AC xor AC is 0
 			break;
 
 			//CLE
 			case 0x0400:
+				printf("CLE\n");
 				E ^= E; //E xor E is 0
 			break;
-			
+
 			//CMS
 			case 0x0200:
-				//code
+				printf("CMS\n");
+				AC = (0x0FFF&(~AC));
 			break;
-			
+
 			//CME
 			case 0x0100:
 				//code
 			break;
-			
+
 			//CIR
 			case 0x0080:
+				printf("CIR\n");
 				E = (0x0001&AC) << 15;
 				//C >> operator can be logical or
 				//arithmetic (implementation dependent)
@@ -100,30 +131,32 @@ int main(int argc, char** argv)
 				AC &= 0x7FFF;
 				AC |= E;
 			break;
-			
+
 			//CIL
 			case 0x0040:
+				printf("CIL\n");
 				E = (0x8000&AC) >> 15;
 				AC <<= 1;
 				AC |= E;
 			break;
-			
+
 			//INC
 			case 0x0020:
+				printf("INC\n");
 				AC++;
 				//print();
 			break;
-			
+
 			//SPA
 			case 0x0010:
 				//code
 			break;
-			
+
 			//SNA
 			case 0x0008:
 				//code
 			break;
-			
+
 			//SZA
 			case 0x0004:
 				//code
@@ -133,7 +166,7 @@ int main(int argc, char** argv)
 			case 0x0002:
 				//code
 			break;
-			
+
 			//HLT
 			case 0x0001:
 				exit(2);
@@ -142,27 +175,12 @@ int main(int argc, char** argv)
 	}
 	else
 	{
+		AR = memory[AR];
 		switch(IR&0x7000)
 		{
 			//AND
 			case 0x0000:
-				if((IR&0x8000) == 0) //Direct
-				{
-				}
-				else //Indirect
-				{
-					AR = memory[AR];
-				}
-				E ^= E;
-				if((memory[AR] + AC) < AC) //overflow
-				{
-					E = 1;
-				}
-				AC += memory[AR];
-			break;
-
-			//ADD
-			case 0x1000:
+				printf("AND\n");
 				if((IR&0x8000) == 0) //Direct
 				{
 				}
@@ -178,8 +196,9 @@ int main(int argc, char** argv)
 				//print();
 			break;
 
-			//LDA
-			case 0x2000:
+			//ADD
+			case 0x1000:
+				printf("ADD\n");
 				if((IR&0x8000) == 0) //Direct
 				{
 				}
@@ -188,15 +207,35 @@ int main(int argc, char** argv)
 					AR = memory[AR];
 				}
 
+				fprintf(stderr, "AR: %04hX\n", AR);
+
+				AC += memory[AR];
+			break;
+
+			//LDA
+			case 0x2000:
+				printf("LDA\n");
+				if((IR&0x8000) == 0) //Direct
+				{
+					fprintf(stderr, "LDA direct used");
+				}
+				else //Indirect
+				{
+					fprintf(stderr, "LDA indirect used");
+					AR = memory[AR];
+				}
+
+				fprintf(stderr, "AR: %04hX\n", AR);
 				DR = memory[AR];
 				//print();
 
-				AC = DR;
+				AC = (DR&0x0FFF);
 				//print();
 			break;
 
 			//STA
 			case 0x3000:
+				printf("STA\n");
 				if((IR&0x8000) == 0) //Direct
 				{
 				}
@@ -210,6 +249,7 @@ int main(int argc, char** argv)
 
 			//BUN
 			case 0x4000:
+				printf("BUN\n");
 				if((IR&0x8000) == 0) //Direct
 				{
 				}
@@ -217,12 +257,15 @@ int main(int argc, char** argv)
 				{
 					AR = memory[AR];
 				}
-				PC = AR;
+				PC = memory[AR];
+				printf("T4 | %04hX | %04hX | %04hX | %04hX | %04hX | %04hX | %04hX |\n",
+					IR, AC, DR, PC, AR, memory[AR], E);
 				//print();
 			break;
 
 			//BSA
 			case 0x5000:
+				printf("BSA\n");
 				if((IR&0x8000) == 0) //Direct
 				{
 				}
@@ -230,17 +273,29 @@ int main(int argc, char** argv)
 				{
 					AR = memory[AR];
 				}
+				fprintf(stderr, "AR: %04hX\n", AR);
+				fprintf(stderr, "before M[AR]: %04hX\n", memory[AR]);
+				fprintf(stderr, "PC: %04hX\n", PC);
 				memory[AR] = PC;
+				fprintf(stderr, "after M[AR]: %04hX\n", memory[AR]);
+				printf("T2 | %04hX | %04hX | %04hX | %04hX | %04hX | %04hX | %04hX |\n",
+					IR, AC, DR, PC, AR, memory[AR], E);
+				printf("---|------+------+------+------+------+------+------|\n");
 
 				AR++;
-				//print();
+				printf("T4 | %04hX | %04hX | %04hX | %04hX | %04hX | %04hX | %04hX |\n",
+					IR, AC, DR, PC, AR, memory[AR], E);
+				printf("---|------+------+------+------+------+------+------|\n");
 
 				PC = AR;
-				//print();
+				printf("T5 | %04hX | %04hX | %04hX | %04hX | %04hX | %04hX | %04hX |\n",
+					IR, AC, DR, PC, AR, memory[AR], E);
+				printf("---|------+------+------+------+------+------+------|\n");
 			break;
 
 			//ISZ
 			case 0x6000:
+				printf("ISZ\n");
 				if((IR&0x8000) == 0) //Direct
 				{
 				}
@@ -264,6 +319,8 @@ int main(int argc, char** argv)
 			break;
 		}
 	}
+
+	fprintf(stderr, "AR: %04hX\n", AR);
 	printf("T2 | %04hX | %04hX | %04hX | %04hX | %04hX | %04hX | %04hX |\n",
 			IR, AC, DR, PC, AR, memory[AR], E);
 	printf("   |------+------+------+------+------+------+------|\n");
@@ -272,3 +329,4 @@ int main(int argc, char** argv)
 
 	return 0;
 }
+
