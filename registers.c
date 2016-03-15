@@ -49,7 +49,7 @@ int main(int argc, char** argv)
     //TR = rand() % 0x0FFF;
 	E = rand() % 2;
 
-	//set for testinga
+	//set for testing
 
 
 	memory[0x0064] = 0x0035;
@@ -67,15 +67,20 @@ int main(int argc, char** argv)
 	memory[4] = 0x0064;
 	memory[5] = 0x2065;
 	memory[6] = 0x3066;
-	memory[7] = 0x5069;
+	memory[7] = 0x7100;
+	memory[8] = 0x5069;
 	memory[20] = 0x6067;
 	memory[21] = 0x4069;
-	memory[8] = 0x1068;
-	memory[9] = 0x7400;
-	memory[10] = 0x7800;
-	memory[11] = 0x7001;
+	memory[9] = 0x1068;
+	memory[10] = 0x7400;
+	memory[11] = 0x7800;
+	memory[12] = 0x7001;
+	memory[13] = 0x7010;
+	memory[14] = 0x7008;
+	memory[15] = 0x7004;
+	memory[16] = 0x7002;
 
-    for(int idx = 0; idx < 14; ++idx)
+    for(int idx = 0; idx < 19; ++idx)
 	{
 		print(-1, AC, PC, DR, AR, IR, E, memory);
 		//T0
@@ -106,12 +111,12 @@ int main(int argc, char** argv)
 
 				//CMS
 				case 0x0200:
-					AC = (0x0FFF&(~AC));
+					AC = ~AC;
 				break;
 
 				//CME
 				case 0x0100:
-					//code
+					E = !E;
 				break;
 
 				//CIR
@@ -134,27 +139,38 @@ int main(int argc, char** argv)
 				//INC
 				case 0x0020:
 					AC++;
-					//print();
 				break;
 
 				//SPA
 				case 0x0010:
-					//code
+					if (AC >> 15 == 0)
+					{
+						PC += 1;
+					}
 				break;
 
 				//SNA
 				case 0x0008:
-					//code
+					if (AC >> 15 == 1)
+					{
+						PC += 1;
+					}
 				break;
 
 				//SZA
 				case 0x0004:
-					//code
+					if (AC == 0)
+					{
+						PC += 1;
+					}
 				break;
 
 				//SZE
 				case 0x0002:
-					//code
+					if (E == 0)
+					{
+						PC += 1;
+					}
 				break;
 
 				//HLT
@@ -201,7 +217,7 @@ int main(int argc, char** argv)
 					DR = memory[AR];
 					print(4, AC, PC, DR, AR, IR, E, memory);
 
-					AC &= DR;
+					AC += DR;
 					print(5, AC, PC, DR, AR, IR, E, memory);
 				break;
 
@@ -219,7 +235,7 @@ int main(int argc, char** argv)
 					DR = memory[AR];
 					print(4, AC, PC, DR, AR, IR, E, memory);
 
-					AC = (DR&0x0FFF);
+					AC = DR;
 					print(5, AC, PC, DR, AR, IR, E, memory);
 				break;
 
@@ -263,7 +279,9 @@ int main(int argc, char** argv)
 					print(3, AC, PC, DR, AR, IR, E, memory);
 					memory[AR] = PC;
 					AR++;
+					print(4, AC, PC, DR, AR, IR, E, memory);
 					PC = AR;
+					print(5, AC, PC, DR, AR, IR, E, memory);
 				break;
 
 				//ISZ
