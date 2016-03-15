@@ -361,10 +361,6 @@ void print(int tier, unsigned short AC, unsigned short PC, unsigned short DR,
 					 unsigned short memory[]
 		  )
 {
-
-	fprintf(stderr, "AC: %04hX\n", AC);
-	fprintf(stderr, "PC: %04hX\n", PC);
-
 	if(tier == -1)
 	{
 		printf("    |  IR  |  AC  |  DR  |  PC  |  AR  | M[AR]|   E  |\n");
